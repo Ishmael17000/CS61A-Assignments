@@ -1,12 +1,6 @@
 # Ignore macOS system files used to store folder metadata
 .DS_Store
 __pycache__/
-.ok_consent
-.ok_context
-.ok_disabled
-.ok_history
-.ok_storage.bak
-.ok_storage.dat
-.ok_storage.dir
+
 
 
