@@ -252,7 +252,7 @@ def is_always_roll(strategy, goal=GOAL):
     # END PROBLEM 7
 
 
-def make_averaged(original_function, times_called=1000):
+def make_averaged(original_function, times_called=1000): # We are considering the frequency to simulate probability
     """Return a function that returns the average value of ORIGINAL_FUNCTION
     called TIMES_CALLED times.
 
@@ -286,6 +286,15 @@ def max_scoring_num_rolls(dice=six_sided, times_called=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    max_score = 0
+    i = 1
+    while i <= 10:
+        current_score = make_averaged(roll_dice, times_called)(i, dice)
+        if current_score > max_score:
+            max_score = current_score
+            max_index = i
+        i += 1
+    return max_index
     # END PROBLEM 9
 
 
@@ -330,14 +339,22 @@ def boar_strategy(score, opponent_score, threshold=11, num_rolls=6):
     points, and returns NUM_ROLLS otherwise. Ignore score and Sus Fuss.
     """
     # BEGIN PROBLEM 10
-    return num_rolls  # Remove this line once implemented.
+    boar_score = boar_brawl(score, opponent_score)
+    if boar_score >= threshold:
+        return 0
+    else:
+        return num_rolls
     # END PROBLEM 10
 
 
 def sus_strategy(score, opponent_score, threshold=11, num_rolls=6):
     """This strategy returns 0 dice when your score would increase by at least threshold."""
     # BEGIN PROBLEM 11
-    return num_rolls  # Remove this line once implemented.
+    boar_sus_score = sus_update(0, score, opponent_score)
+    if boar_sus_score - score >= threshold:
+        return 0
+    else:
+        return num_rolls
     # END PROBLEM 11
 
 
@@ -345,9 +362,30 @@ def final_strategy(score, opponent_score):
     """Write a brief description of your final strategy.
 
     *** YOUR DESCRIPTION HERE ***
+    1. In each turn, greedily search for the best move (consider the result of 0 move with sus, compare with rolling 6)
+    2. First we compute the expectation of score by rolling n dices E_n, as well as the probability of getting 1.
+    ------------------------------------
+    E_1 = (1+...+6)/6 = 3.5
+    E_2 = E(Get_One) + E_2(Get_No_One)
+        = (11 + 200) / 36 = 5.86
+    P_1 = 1/6
+    P_2 = 11/36 ≈ 1/3
+    ------------------------------------
+    Therefore, when `score` reaches 96, I choose not to risk rolling big numbers, but to roll 1 instead.
     """
     # BEGIN PROBLEM 12
-    return 6  # Remove this line once implemented.
+    # First, check whether greater than 95
+    if score > 95:
+        return 1
+    else:
+        # Compare boar_sus with max_score_num
+        boar_sus_score = sus_update(0, score, opponent_score) - score
+        max_score = 8.57 # pre-computed
+        if boar_sus_score < max_score:
+            return 6
+        else:
+            return 0
+        
     # END PROBLEM 12
 
 
