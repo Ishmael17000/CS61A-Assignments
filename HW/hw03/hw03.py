@@ -60,6 +60,12 @@ def digit_distance(n):
     True
     """
     "*** YOUR CODE HERE ***"
+    if n < 10:
+        return 0
+    else:
+        last_digit = n % 10
+        second_last_digit = (n // 10) % 10  # Here we should use n//10 instead of (n-last_digit)/10, because normal division will return a float
+        return abs(last_digit - second_last_digit) + digit_distance(n // 10)
 
 
 def interleaved_sum(n, odd_func, even_func):
@@ -84,6 +90,19 @@ def interleaved_sum(n, odd_func, even_func):
     True
     """
     "*** YOUR CODE HERE ***"
+    def helper(i, is_odd:bool):
+        """
+        Start from i, apply recursion on helper
+        """
+        if i > n:
+            return 0
+        else:
+            if is_odd:
+                return odd_func(i) + helper(i+1, not is_odd)
+            else:
+                return even_func(i) + helper(i+1, not is_odd)
+    return helper(1, True)
+        
 
 
 def next_smaller_dollar(bill):
