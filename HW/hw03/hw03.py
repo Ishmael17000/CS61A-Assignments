@@ -139,6 +139,26 @@ def count_dollars(total):
     True
     """
     "*** YOUR CODE HERE ***"
+    def helper(current, max_denom):
+        """We define a helper function, which considers whether to use the available max denomination."""
+
+        # Base case:
+        if current == 0:
+            return 1 # a successful change
+        elif current < 0:
+            return 0 # an unsuccessful change
+        else: # current > 0
+            if max_denom == 1:
+                return 1 # the only case is all 1's
+
+        # Recursion process
+        return helper(current-max_denom, max_denom) + helper(current, next_smaller_dollar(max_denom))
+
+    return helper(total, 100)
+
+
+    
+        
 
 
 def next_larger_dollar(bill):
@@ -175,6 +195,18 @@ def count_dollars_upward(total):
     True
     """
     "*** YOUR CODE HERE ***"
+    def helper(current, min_denom):
+        if current == 0:
+            return 1
+        elif current < 0:
+            return 0
+        else:
+            if min_denom < 100:
+                return helper(current-min_denom, min_denom) + helper(current, next_larger_dollar(min_denom))
+            elif min_denom == 100:
+                return helper(current-min_denom, min_denom)
+            
+    return (helper(total, 1))
 
 
 def print_move(origin, destination):
@@ -210,6 +242,20 @@ def move_stack(n, start, end):
     """
     assert 1 <= start <= 3 and 1 <= end <= 3 and start != end, "Bad start/end"
     "*** YOUR CODE HERE ***"
+    # If we know the proccess to move n-1 disks, we first move them to the intermediate state, then move n to the end.
+    # Then we move the n-1 disks to the end.
+
+    # Base case:
+    if n == 1:
+        print_move(start, end)
+        return
+    else:
+        # move n-1 disks
+        middle = 6 - start - end
+        move_stack(n-1, start, middle)
+        print_move(start, end)
+        move_stack(n-1, middle, end)
+
 
 
 from operator import sub, mul
@@ -225,5 +271,5 @@ def make_anonymous_factorial():
     ...     ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'FunctionDef', 'Recursion'])
     True
     """
-    return 'YOUR_EXPRESSION_HERE'
+    return (lambda f: lambda n: f(f, n))(lambda f, n: 1 if n == 0 else n * f(f, n - 1))
 
