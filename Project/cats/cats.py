@@ -38,6 +38,8 @@ def pick(paragraphs, select, k):
     """
     # BEGIN PROBLEM 1
     "*** YOUR CODE HERE ***"
+    feasible = [para for para in paragraphs if select(para)]
+    return feasible[k] if len(feasible) > k else ''
     # END PROBLEM 1
 
 
@@ -58,6 +60,18 @@ def about(subject):
 
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
+    def check_about(paragraph: str):
+        # process the paragraph
+        paragraph = remove_punctuation(paragraph)
+        paragraph = lower(paragraph)
+        paragraph = split(paragraph)
+        # now we get a list of lower_case words without punctuation
+        for key_words in subject:
+            for words in paragraph:
+                if key_words == words:
+                    return True
+        return False
+    return check_about
     # END PROBLEM 2
 
 
@@ -88,6 +102,23 @@ def accuracy(typed, source):
     source_words = split(source)
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
+    # base case
+    if not typed and not source:
+        return 100.0
+    if (not typed and source) or (typed and not source):
+        return 0.0
+    
+    total = len(typed_words)
+    source_len = len(source_words)
+    correct = 0
+    # word-wise check
+    for i in range(total):
+        if i >= source_len:
+            continue
+        elif source_words[i] == typed_words[i]:
+            correct += 1
+    return correct / total * 100
+            
     # END PROBLEM 3
 
 
@@ -106,6 +137,9 @@ def wpm(typed, elapsed):
     assert elapsed > 0, "Elapsed time must be positive"
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
+    count = len(typed) / 5
+    minite_elapsed = elapsed / 60
+    return count / minite_elapsed
     # END PROBLEM 4
 
 
@@ -167,6 +201,11 @@ def autocorrect(typed_word, word_list, diff_function, limit):
     """
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+    if typed_word in word_list:
+        return typed_word
+    cal_diff = lambda word: diff_function(typed_word, word, limit)
+    best = min(word_list, key=cal_diff)
+    return best if cal_diff(best) <= limit else typed_word
     # END PROBLEM 5
 
 
@@ -193,7 +232,28 @@ def furry_fixes(typed, source, limit):
     5
     """
     # BEGIN PROBLEM 6
-    assert False, 'Remove this line'
+    len1, len2 = len(typed), len(source)
+    diff = abs(len1 - len2)
+    threshold = min(len1, len2)
+
+    # define a helper to implement recursion
+    def helper(current, count):
+        '''
+        current: start position
+        count: num of different words, start from 0
+        '''
+
+        # stopping condition
+        if count + diff > limit or current >= threshold:
+            return count + diff
+        else:
+            if typed[current] != source[current]:
+                return helper(current + 1, count + 1)
+            else:
+                return helper(current + 1, count)
+            
+    return helper(0, 0)
+
     # END PROBLEM 6
 
 
@@ -214,25 +274,40 @@ def minimum_mewtations(typed, source, limit):
     >>> minimum_mewtations("ckiteus", "kittens", big_limit) # ckiteus -> kiteus -> kitteus -> kittens
     3
     """
-    assert False, 'Remove this line'
-    if ___________: # Base cases should go here, you may add more base cases as needed.
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
-    # Recursive cases should go below here
-    if ___________: # Feel free to remove or add additional cases
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
-    else:
-        add = ... # Fill in these lines
-        remove = ...
-        substitute = ...
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
 
+    # Begin my soluton:
+    """
+    The base idea is that, although the modification process looks disordered, 
+    it can be thought as a set of operations on sluts of fixed lenght(the target), 
+    on which the order of operations doesn't matter. Hence we can search for all the 
+    feasible operations in a specific order and find the one that required minimum 
+    num of steps.
+    """
 
+    # Use a helper function to track the current moves
+    def helper(typed_sub, source_sub, moves_so_far):
+        # Check for upper limit
+        if moves_so_far > limit:
+            return limit + 1
+        
+        # Base case, when one is empty
+        if not typed_sub or not source_sub:
+            return abs(len(typed_sub)-len(source_sub)) + moves_so_far
+        
+        # Recursion process
+        # Do word-wise check
+        if typed_sub[-1] == source_sub[-1]:
+            return helper(typed_sub[:-1], source_sub[:-1], moves_so_far)
+        else:
+            add = helper(typed_sub, source_sub[:-1], moves_so_far+1)
+            delete = helper(typed_sub[:-1], source_sub, moves_so_far+1)
+            substitute = helper(typed_sub[:-1], source_sub[:-1], moves_so_far+1)
+            return min(add, delete, substitute)
+        
+    result = helper(typed, source, 0)
+    return result if result <= limit else limit + 1
+
+        
 # Ignore the line below
 minimum_mewtations = count(minimum_mewtations)
 
@@ -275,7 +350,19 @@ def report_progress(typed, source, user_id, upload):
     0.2
     """
     # BEGIN PROBLEM 8
-    "*** YOUR CODE HERE ***"
+    # Compute progress
+    correct = 0
+    for i in range(len(typed)):
+        if typed[i] != source[i]:
+            break
+        else:
+            correct += 1
+    
+    progress = correct / len(source)
+    info = {'id': user_id, 'progress': progress}
+    upload(info)
+
+    return progress
     # END PROBLEM 8
 
 
@@ -299,7 +386,9 @@ def time_per_word(words, timestamps_per_player):
     """
     tpp = timestamps_per_player  # A shorter name (for convenience)
     # BEGIN PROBLEM 9
-    times = []  # You may remove this line
+    def cal_time(lst):
+        return [lst[i+1]-lst[i] for i in range(len(lst)-1)]
+    times = [cal_time(time_stamp) for time_stamp in tpp]  # You may remove this line
     # END PROBLEM 9
     return {'words': words, 'times': times}
 
@@ -326,7 +415,27 @@ def fastest_words(words_and_times):
     player_indices = range(len(times))  # contains an *index* for each player
     word_indices = range(len(words))    # contains an *index* for each word
     # BEGIN PROBLEM 10
-    "*** YOUR CODE HERE ***"
+    # build lists for each player
+    result_dict = {}
+    for i in player_indices:
+        result_dict[i] = []
+    
+    def find_min(lst):
+        mini = lst[0]
+        index = 0
+        for i in range(len(lst)):
+            if lst[i] < mini:
+                mini = lst[i]
+                index = i
+        return index
+
+    for j in word_indices:
+        time_lst = [time[j] for time in times]
+        player_index = find_min(time_lst)
+        result_dict[player_index].append(words[j])
+
+    return list(result_dict.values())
+        
     # END PROBLEM 10
 
 
