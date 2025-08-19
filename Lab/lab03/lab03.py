@@ -93,6 +93,26 @@ def double_eights(n):
     True
     """
     "*** YOUR CODE HERE ***"
+    # Use recursion by checking the last two digits
+    def helper(x, result=False):
+        # Base case
+        # When n<10, result is False. Or when two consecutive 8 are found and result becomes True
+        if x < 10 or result:
+            return result
+        # Recursion
+        # Check the last digit. If it's 8, then check the last second digit.
+        # If it's not, check the remaining.
+        if x % 10 == 8:
+            if x % 100 == 88:
+                result = True
+                return helper(x, result)
+            else:
+                return helper(x // 100, result)
+        else:
+            return helper(x // 10, result)
+    
+    return helper(n)
+
 
 
 def make_onion(f, g):
@@ -121,10 +141,10 @@ def make_onion(f, g):
     """
     def can_reach(x, y, limit):
         if limit < 0:
-            return ____
+            return False
         elif x == y:
-            return ____
+            return True
         else:
-            return can_reach(____, ____, limit - 1) or can_reach(____, ____, limit - 1)
+            return can_reach(f(x), y, limit - 1) or can_reach(g(x), y, limit - 1)
     return can_reach
 
