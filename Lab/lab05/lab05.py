@@ -1,7 +1,7 @@
 HW_SOURCE_FILE=__file__
 
 
-def insert_items(s, before, after):
+def insert_items(s: list, before, after):
     """Insert after into s after each occurrence of before and then return s.
 
     >>> test_s = [1, 5, 8, 5, 2, 3]
@@ -27,6 +27,15 @@ def insert_items(s, before, after):
     True
     """
     "*** YOUR CODE HERE ***"
+    i = 0
+    num_processed = 0
+    # Check item:
+    while i + num_processed < len(s):
+        if s[i + num_processed] == before:
+            s.insert(i + num_processed + 1, after)
+            num_processed += 1
+        i += 1
+    return s
 
 
 def group_by(s, fn):
@@ -40,12 +49,12 @@ def group_by(s, fn):
     {9: [-3, 3], 4: [-2, 2], 1: [-1, 1], 0: [0]}
     """
     grouped = {}
-    for ____ in ____:
-        key = ____
+    for item in s:
+        key = fn(item)
         if key in grouped:
-            ____
+            continue
         else:
-            grouped[key] = ____
+            grouped[key] = [x for x in s if fn(x) == key]
     return grouped
 
 
@@ -71,6 +80,12 @@ def count_occurrences(t, n, x):
     2
     """
     "*** YOUR CODE HERE ***"
+    count = 0
+    for i in range(n):
+        element = next(t)
+        if x == element:
+            count += 1
+    return count
 
 
 def repeated(t, k):
@@ -94,6 +109,18 @@ def repeated(t, k):
     """
     assert k > 1
     "*** YOUR CODE HERE ***"
+    def helper(last, t_sub, count):
+        if count == k:
+            return last
+        current = next(t_sub)
+        if current == last:
+            count += 1
+        else:
+            count = 1
+        return helper(current, t_sub, count)
+    
+    return helper(None, t, 1)
+
 
 
 def sprout_leaves(t, leaves):
