@@ -164,12 +164,12 @@ def max_path_sum(t):
     """
     "*** YOUR CODE HERE ***"
     def helper(t_sub, val=0):
+        """Parameter val is the sum at the current node(not including)"""
         val += label(t_sub)
         if is_leaf(t_sub):
             return val
         else:
             return max([helper(branch, val) for branch in branches(t_sub)])
-
     return helper(t, 0)
  
 
