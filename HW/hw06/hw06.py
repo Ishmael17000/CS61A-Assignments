@@ -193,6 +193,20 @@ def two_list(vals, counts):
     Link(1, Link(1, Link(3, Link(3, Link(2)))))
     """
     "*** YOUR CODE HERE ***"
+    # First make a larger list containing all the elements
+    all_elements = []
+    for i in range(len(counts)):
+        for _ in range(counts[i]):
+            all_elements.append(vals[i])
+    
+    def helper(lst):
+        if lst:
+            return Link(lst[0], helper(lst[1:]))
+        else:
+            return Link.empty
+    
+    return helper(all_elements)
+        
 
 
 
