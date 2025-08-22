@@ -300,6 +300,7 @@ class ContainerAnt(Ant):
     ContainerAnt can share a space with other ants by containing them.
     """
     is_container = True
+    name = 'Container'
 
     def __init__(self, health):
         super().__init__(health)
